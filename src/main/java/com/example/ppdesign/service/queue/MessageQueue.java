@@ -1,6 +1,7 @@
 package com.example.ppdesign.service.queue;
 
 import com.example.ppdesign.constants.Constants;
+import com.example.ppdesign.exception.QueueEmptyException;
 import com.example.ppdesign.exception.QueueOverFlowException;
 import com.example.ppdesign.service.exchange.IExchange;
 import com.example.ppdesign.util.JsonUtil;
@@ -38,23 +39,29 @@ public class MessageQueue implements IQueue{
     public synchronized void enqueue(JsonNode message, String topic, String expireAfterMillis) {
         if (isFull()) {
             log.error("Queue is full. Can't sent message {}", message);
-            throw new QueueOverFlowException("Queue is full");
+            throw new QueueOverFlowException("Queue is full. Can't add new node");
         }
+
         ((ObjectNode)message).put(Constants.TOPIC, topic);
         ((ObjectNode)message).put(Constants.EXPIRE_AFTER_MILLIS, expireAfterMillis);
         queue.add(message);
         eventArrivedTimeMap.put(message, System.currentTimeMillis());
+        log.info("Added message in queue {}. Queue size is {}", message, queue.size());
         iExchange.exchange();
     }
 
     @Override
     public synchronized JsonNode dequeue() {
         if (isEmpty()) {
-            //TODO exception handling
             log.error("Queue is empty. Can't dequeue");
-            return null;
+            throw new QueueEmptyException("Queue is empty. Can't dequeue");
         }
-        return queue.removeFirst();
+
+        log.info("Removing message from queue. Queue size for now is {}", queue.size());
+        JsonNode jsonNode = queue.removeFirst();
+        eventArrivedTimeMap.remove(jsonNode);
+        log.info("Removed message from queue {}. Queue size finally is {}", jsonNode, queue.size());
+        return jsonNode;
     }
 
     @Override

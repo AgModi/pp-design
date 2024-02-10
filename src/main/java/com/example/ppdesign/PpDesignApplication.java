@@ -36,7 +36,7 @@ public class PpDesignApplication {
 			};
 
 			t = new Timer();
-			t.scheduleAtFixedRate(task, 0, 10000);
+			t.scheduleAtFixedRate(task, 0, 100000);
 		}
 	}
 
@@ -51,7 +51,7 @@ public class PpDesignApplication {
 			};
 
 			t = new Timer();
-			t.scheduleAtFixedRate(task, 0, 10000);
+			t.scheduleAtFixedRate(task, 0, 100000);
 		}
 	}
 }
