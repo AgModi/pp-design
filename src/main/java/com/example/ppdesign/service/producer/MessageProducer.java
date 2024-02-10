@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 public class MessageProducer implements IProducer<JsonNode>{
 
     @Value("${topic.employee.expire.after.millis}")
-    public static String EXPIRE_AFTER_MILLIS;
+    public String expireAfterMillis;
 
     @Value("${exchange.topic}")
-    private static String TOPIC;
+    private String topic;
 
     @Autowired
     @Qualifier("messageQueue")
@@ -22,7 +22,7 @@ public class MessageProducer implements IProducer<JsonNode>{
 
     @Override
     public void produce(JsonNode message) {
-        queue.enqueue(message, TOPIC, EXPIRE_AFTER_MILLIS);
+        queue.enqueue(message, topic, expireAfterMillis);
     }
 
     @Override

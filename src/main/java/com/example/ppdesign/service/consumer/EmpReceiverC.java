@@ -1,17 +1,21 @@
 package com.example.ppdesign.service.consumer;
 
+import com.example.ppdesign.constants.Constants;
 import com.example.ppdesign.dto.EmployeeDto;
+import com.example.ppdesign.exception.ListnerFailureException;
 import com.example.ppdesign.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Slf4j
 public class EmpReceiverC implements IConsumer{
 
-    private static final List<String> TOPICS = Arrays.asList("employee");
+    private static final List<String> TOPICS = Arrays.asList(Constants.TOPIC_EMPLOYEE);
 
     private static final List<Class<? extends IConsumer>> PROCESS_AFTER = Arrays.asList(EmpReceiverA.class, EmpReceiverB.class);
 
@@ -19,7 +23,7 @@ public class EmpReceiverC implements IConsumer{
 
     @Override
     public boolean consume(JsonNode node) {
-        System.out.println("In consumer C for message :" + node);
+        log.info("In consumer C for message {}", node);
         return processMessage(node);
     }
 
@@ -41,10 +45,10 @@ public class EmpReceiverC implements IConsumer{
     private boolean processMessage(JsonNode node) {
         EmployeeDto employeeDto = JsonUtil.getObject(node, EmployeeDto.class);
         if (employeeDto != null) {
-            System.out.println("Resurting true from consumer C for message "+ node);
+            log.info("Returting true from consumer C for message {}", node);
             return true;
         }
-        System.out.println("Resurting false from consumer C for message "+ node);
-        return false;
+        log.info("Returting false from consumer C for message {}", node);
+        throw new ListnerFailureException("Listsner C failed to process object" + node);
     }
 }

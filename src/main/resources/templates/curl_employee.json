@@ -1,0 +1,7 @@
+curl --location 'http://localhost:8080/employees/create' \
+--header 'Content-Type: application/json' \
+--data '{
+"id" : 1,
+"name" : "John",
+"salary" : 400000
+}'

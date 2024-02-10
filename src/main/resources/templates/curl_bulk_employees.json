@@ -1,0 +1,54 @@
+curl --location 'http://localhost:8080/employees/createBulk' \
+--header 'Content-Type: application/json' \
+--data '[
+{
+"id": 1,
+"name": "John",
+"salary": 400000
+},
+{
+"id": 2,
+"name": "Don",
+"salary": 400000
+},
+{
+"id": 3,
+"name": "Somesh",
+"salary": 50000
+},
+{
+"id": 4,
+"name": "Hem",
+"salary": 600000
+},
+{
+"id": 7,
+"name": "Rohn",
+"salary": 700000
+},
+{
+"id": 8,
+"name": "Bohn",
+"salary": 400000
+},
+{
+"id": 9,
+"name": "Camp",
+"salary": 100000
+},
+{
+"id": 10,
+"name": "John",
+"salary": 400000
+},
+{
+"id": 11,
+"name": "John",
+"salary": 400000
+},
+{
+"id": 12,
+"name": "John",
+"salary": 400000
+}
+]'

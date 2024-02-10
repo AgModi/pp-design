@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class ExchangeMQ {
+public class ExchangeMQ implements IExchange<JsonNode>{
 
     private static final Map<String, List<IConsumer>> topicWiseConsumerBeanMap = new HashMap<>();
 
@@ -24,10 +23,6 @@ public class ExchangeMQ {
 
     @Autowired
     private ApplicationContext context;
-
-    @Autowired
-    @Qualifier("messageQueue")
-    private IQueue queue;
 
     @PostConstruct
     public void init() {
@@ -62,19 +57,29 @@ public class ExchangeMQ {
         log.info("{}",queueBeans);
     }
 
+    @Override
     public void exchange() {
         Thread thread = new Thread(() -> {
-            synchronized (queue) {
-                JsonNode node = queue.dequeue();
-                String topic = JsonUtil.getStringValueFromJson(node, Constants.TOPIC);
-                List<IConsumer> consumerForTopic = topicWiseConsumerBeanMap.get(topic);
-                consumerForTopic.forEach(consumer -> {
-                    exchange(consumer, node, consumer.getRetryCount());
-                });
+            Map<String, IQueue> queueMap = context.getBeansOfType(IQueue.class);
+            queueMap.values().stream().forEach(queue -> {
+                synchronized (queue) {
+                    JsonNode node = queue.dequeue();
+                    String topic = JsonUtil.getStringValueFromJson(node, Constants.TOPIC);
+                    List<IConsumer> consumerForTopic = topicWiseConsumerBeanMap.get(topic);
+                    consumerForTopic.forEach(consumer -> {
+                        exchange(consumer, node, consumer.getRetryCount());
+                    });
 
-                queue.notify();
-            }
+                    queue.notify();
+                }
+            });
         });
+        thread.start();
+    }
+
+    @Override
+    public void exchange(JsonNode obj) {
+        //Not needed for now
     }
 
     private void exchange(IConsumer consumer, JsonNode node, int retryCount) {
