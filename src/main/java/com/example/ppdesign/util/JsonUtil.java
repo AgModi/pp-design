@@ -15,6 +15,7 @@ public class JsonUtil {
     public static JsonNode getJson(Object obj) {
         if (obj == null) {
             return null;
+            //Throw exceptioption
         }
         return mapper.convertValue(obj, JsonNode.class);
     }

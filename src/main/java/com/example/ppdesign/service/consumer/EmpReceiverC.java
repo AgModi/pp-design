@@ -1,6 +1,6 @@
 package com.example.ppdesign.service.consumer;
 
-import com.example.ppdesign.dto.Employee;
+import com.example.ppdesign.dto.EmployeeDto;
 import com.example.ppdesign.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
@@ -11,9 +11,11 @@ import java.util.List;
 @Component
 public class EmpReceiverC implements IConsumer{
 
-    private static final List<String> topics = Arrays.asList("employee");
+    private static final List<String> TOPICS = Arrays.asList("employee");
 
-    private static final List<Class<? extends IConsumer>> processAfter = Arrays.asList(EmpReceiverA.class, EmpReceiverB.class);
+    private static final List<Class<? extends IConsumer>> PROCESS_AFTER = Arrays.asList(EmpReceiverA.class, EmpReceiverB.class);
+
+    private static final int RETRY_COUNT = 3;
 
     @Override
     public boolean consume(JsonNode node) {
@@ -23,17 +25,22 @@ public class EmpReceiverC implements IConsumer{
 
     @Override
     public List<String> getTopicsToListen() {
-        return topics;
+        return TOPICS;
     }
 
     @Override
     public List<Class<? extends IConsumer>> getClassesToProcessAfter() {
-        return processAfter;
+        return PROCESS_AFTER;
+    }
+
+    @Override
+    public int getRetryCount() {
+        return RETRY_COUNT;
     }
 
     private boolean processMessage(JsonNode node) {
-        Employee employee = JsonUtil.getObject(node, Employee.class);
-        if (employee != null) {
+        EmployeeDto employeeDto = JsonUtil.getObject(node, EmployeeDto.class);
+        if (employeeDto != null) {
             System.out.println("Resurting true from consumer C for message "+ node);
             return true;
         }

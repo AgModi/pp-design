@@ -1,12 +1,11 @@
 package com.example.ppdesign.service.queue;
 
-import com.example.ppdesign.dto.Employee;
+import com.example.ppdesign.dto.EmployeeDto;
 import com.example.ppdesign.util.JsonUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessageQueueTest {
@@ -17,36 +16,30 @@ public class MessageQueueTest {
     //@Test
     public void testEnqueue() {
         for (int i = 0; i < 12; i++) {
-            Employee employee = new Employee(i, "Rachit", 40000);
-            System.out.println("Runnable 1 :" +messageQueue.enqueue(JsonUtil.getJson(employee)));
+            EmployeeDto employeeDto = new EmployeeDto(i, "Rachit", 40000);
+            messageQueue.enqueue(JsonUtil.getJson(employeeDto), "employee", "10000" );
         }
     }
 
-    //@Test
-    public void testEnqueueWithThread() {
-        //TODO failed this
+    @Test
+    public void testEnqueueWithThread() throws InterruptedException {
+
         Runnable runnable1 = () -> {
-            synchronized (messageQueue) {
-                for (int i = 0; i < 12; i++) {
-                    Employee employee = new Employee(i, "Rachit", 40000);
-                    System.out.println("Runnable 1 run iteration "+i);
-                    System.out.println("Runnable 1 :" +messageQueue.enqueue(JsonUtil.getJson(employee)));
-                    try {
-                        messageQueue.wait();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+            for (int i = 0; i < 12; i++) {
+                EmployeeDto employeeDto = new EmployeeDto(i+100, "Rachit", 40000);
+                System.out.println("Runnable 1 run iteration "+i);
+                synchronized (messageQueue) {
+                    messageQueue.enqueue(JsonUtil.getJson(employeeDto), "employee", "10000");
                 }
             }
         };
 
         Runnable runnable2 = () -> {
-            synchronized (messageQueue) {
-                for (int i = 0; i < 12; i++) {
-                    Employee employee = new Employee(i+100, "Rachit", 40000);
-                    System.out.println("Runnable 2 run iteration "+i);
-                    System.out.println("Runnable 2 :" + messageQueue.enqueue(JsonUtil.getJson(employee)));
-                    messageQueue.notify();
+            for (int i = 0; i < 12; i++) {
+                EmployeeDto employeeDto = new EmployeeDto(i+100, "Rachit", 40000);
+                System.out.println("Runnable 2 run iteration "+i);
+                synchronized (messageQueue) {
+                    messageQueue.enqueue(JsonUtil.getJson(employeeDto), "employee", "10000");
                 }
             }
         };
@@ -58,5 +51,7 @@ public class MessageQueueTest {
 
         t1.start();
         t2.start();
+        t1.join();
+        t2.join();
     }
 }

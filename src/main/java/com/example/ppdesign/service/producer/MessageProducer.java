@@ -1,24 +1,32 @@
 package com.example.ppdesign.service.producer;
 
-import com.example.ppdesign.constants.Constants;
 import com.example.ppdesign.service.queue.IQueue;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MessageProducer implements IProducer<JsonNode>{
 
-    private static String topic = "employee";
+    @Value("${topic.employee.expire.after.millis}")
+    public static String EXPIRE_AFTER_MILLIS;
+
+    @Value("${exchange.topic}")
+    private static String TOPIC;
 
     @Autowired
+    @Qualifier("messageQueue")
     private IQueue queue;
 
     @Override
-    public void send(JsonNode message) {
-        ((ObjectNode)message).put(Constants.TOPIC, topic);
-        boolean isMessageQueued = queue.enqueue(message);
-        System.out.println("Message is : "+ (isMessageQueued? "Queued" : "Not queued") + "\n" + "Message :"+ message);
+    public void produce(JsonNode message) {
+        queue.enqueue(message, TOPIC, EXPIRE_AFTER_MILLIS);
+    }
+
+    @Override
+    public JsonNode remove() {
+        return queue.dequeue();
     }
 }

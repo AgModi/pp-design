@@ -1,7 +1,6 @@
 package com.example.ppdesign.service.producer;
 
-import com.example.ppdesign.dto.Employee;
-import com.example.ppdesign.service.queue.IQueue;
+import com.example.ppdesign.dto.EmployeeDto;
 import com.example.ppdesign.service.queue.MessageQueue;
 import com.example.ppdesign.util.JsonUtil;
 import com.example.ppdesign.util.TestDataGenerator;
@@ -24,8 +23,8 @@ public class MessageProducerTest {
 
     @Test
     public void testSendMessage() {
-        List<Employee> employees = TestDataGenerator.createMockEmployeesData(5);
-        employees.forEach(emp -> messageProducer.send(JsonUtil.getJson(emp)));
+        List<EmployeeDto> employeeDtos = TestDataGenerator.createMockEmployeesData(5);
+        employeeDtos.forEach(emp -> messageProducer.produce(JsonUtil.getJson(emp)));
     }
 
 }

@@ -6,10 +6,16 @@ import org.springframework.stereotype.Component;
 @Component
 public interface IQueue {
 
-    boolean enqueue(JsonNode message);
+    void enqueue(JsonNode message, String topic, String expireAfterMillis);
 
     JsonNode dequeue();
 
     int size();
+
+    boolean isFull();
+
+    boolean isEmpty();
+
+    void removeExpiredItems();
 
 }

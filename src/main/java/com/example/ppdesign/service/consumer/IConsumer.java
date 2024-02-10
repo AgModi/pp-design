@@ -13,4 +13,6 @@ public interface IConsumer {
 
     public List<Class<? extends IConsumer>> getClassesToProcessAfter();
 
+    public int getRetryCount();
+
 }

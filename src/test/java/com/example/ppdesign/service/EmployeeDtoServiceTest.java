@@ -1,6 +1,6 @@
 package com.example.ppdesign.service;
 
-import com.example.ppdesign.dto.Employee;
+import com.example.ppdesign.dto.EmployeeDto;
 import com.example.ppdesign.service.producer.MessageProducer;
 import com.example.ppdesign.util.JsonUtil;
 import com.example.ppdesign.util.TestDataGenerator;
@@ -16,7 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EmployeeServiceTest {
+public class EmployeeDtoServiceTest {
 
     @Mock
     private MessageProducer messageProducer;
@@ -26,17 +26,17 @@ public class EmployeeServiceTest {
 
     @Test
     public void testCreateEmployees() {
-        List<Employee> employees = TestDataGenerator.createMockEmployeesData(5);
-        Assert.assertEquals(5, employees.size());
+        List<EmployeeDto> employeeDtos = TestDataGenerator.createMockEmployeesData(5);
+        Assert.assertEquals(5, employeeDtos.size());
     }
 
     @Test
     public void testSendEmployees() {
-        List<Employee> employees = TestDataGenerator.createMockEmployeesData(5);
-        employeeService.sendEmployees(employees);
-        employees.forEach(emp -> {
+        List<EmployeeDto> employeeDtos = TestDataGenerator.createMockEmployeesData(5);
+        employeeService.sendEmployees(employeeDtos);
+        employeeDtos.forEach(emp -> {
             JsonNode jsonNode = JsonUtil.getJson(emp);
-            Mockito.verify(messageProducer, Mockito.times(1)).send(jsonNode);
+            Mockito.verify(messageProducer, Mockito.times(1)).produce(jsonNode);
         });
     }
 }
