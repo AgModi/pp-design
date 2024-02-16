@@ -20,12 +20,6 @@ public class EmployeeService implements IQueueService<EmployeeDto>{
     @Qualifier("messageProducer")
     private IProducer iProducer;
 
-    public void sendEmployees(List<EmployeeDto> employeeDtos) {
-        employeeDtos.stream().forEach(emp -> {
-            iProducer.produce(JsonUtil.getJson(emp));
-        });
-    }
-
     @Override
     public EmpCreateResp enqueueData(EmployeeDto object) {
         iProducer.produce(JsonUtil.getJson(object));

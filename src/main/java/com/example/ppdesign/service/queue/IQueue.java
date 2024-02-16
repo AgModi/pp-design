@@ -1,14 +1,14 @@
 package com.example.ppdesign.service.queue;
 
+import com.example.ppdesign.dto.MessageDto;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public interface IQueue {
 
     void enqueue(JsonNode message, String topic, String expireAfterMillis);
 
-    JsonNode dequeue();
+    MessageDto dequeue();
 
     int size();
 

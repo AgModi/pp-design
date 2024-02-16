@@ -27,6 +27,6 @@ public class MessageProducer implements IProducer<JsonNode>{
 
     @Override
     public JsonNode remove() {
-        return queue.dequeue();
+        return queue.dequeue().getData();
     }
 }

@@ -40,7 +40,6 @@ public class PpDesignApplication {
 		}
 	}
 
-	@Deprecated
 	public static synchronized void removeExpiredItemsFromQueue() {
 		if (t == null) {
 			TimerTask task = new TimerTask() {

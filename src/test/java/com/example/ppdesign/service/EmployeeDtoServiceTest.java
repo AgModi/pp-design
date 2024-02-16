@@ -1,6 +1,7 @@
 package com.example.ppdesign.service;
 
 import com.example.ppdesign.dto.EmployeeDto;
+import com.example.ppdesign.dto.response.EmpCreateResp;
 import com.example.ppdesign.service.producer.MessageProducer;
 import com.example.ppdesign.util.JsonUtil;
 import com.example.ppdesign.util.TestDataGenerator;
@@ -33,7 +34,8 @@ public class EmployeeDtoServiceTest {
     @Test
     public void testSendEmployees() {
         List<EmployeeDto> employeeDtos = TestDataGenerator.createMockEmployeesData(5);
-        employeeService.sendEmployees(employeeDtos);
+        EmpCreateResp empCreateResp = employeeService.enqueueData(employeeDtos);
+        Assert.assertEquals("Successfully pushing of employees data ", empCreateResp.getMessage());
         employeeDtos.forEach(emp -> {
             JsonNode jsonNode = JsonUtil.getJson(emp);
             Mockito.verify(messageProducer, Mockito.times(1)).produce(jsonNode);

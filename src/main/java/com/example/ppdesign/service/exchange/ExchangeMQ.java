@@ -1,9 +1,8 @@
 package com.example.ppdesign.service.exchange;
 
-import com.example.ppdesign.constants.Constants;
+import com.example.ppdesign.dto.MessageDto;
 import com.example.ppdesign.service.consumer.IConsumer;
 import com.example.ppdesign.service.queue.IQueue;
-import com.example.ppdesign.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -63,11 +62,11 @@ public class ExchangeMQ implements IExchange<JsonNode>{
             Map<String, IQueue> queueMap = context.getBeansOfType(IQueue.class);
             queueMap.values().stream().forEach(queue -> {
                 synchronized (queue) {
-                    JsonNode node = queue.dequeue();
-                    String topic = JsonUtil.getStringValueFromJson(node, Constants.TOPIC);
+                    MessageDto node = queue.dequeue();
+                    String topic = node.getTopic();
                     List<IConsumer> consumerForTopic = topicWiseConsumerBeanMap.get(topic);
                     consumerForTopic.forEach(consumer -> {
-                        exchange(consumer, node, consumer.getRetryCount());
+                        exchange(consumer, node.getData(), consumer.getRetryCount());
                     });
 
                     queue.notify();
@@ -106,8 +105,8 @@ public class ExchangeMQ implements IExchange<JsonNode>{
         queueBeans.forEach(
                 iQueue -> {
                     while (!iQueue.isEmpty()) {
-                        JsonNode node = iQueue.dequeue();
-                        String nodeTopic = JsonUtil.getStringValueFromJson(node, Constants.TOPIC);
+                        MessageDto node = iQueue.dequeue();
+                        String nodeTopic = node.getTopic();
 
                     }
                 }
